@@ -1,3 +1,10 @@
+
+Router.route('/items');
+
+Router.route('/message', function () {
+  this.render('message.html');
+});
+
 if (Meteor.isClient) {
   // counter starts at 0
   Session.setDefault('counter', 0);
