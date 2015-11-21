@@ -1,0 +1,25 @@
+{
+  "name": "wildhackz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.13.3",
+    "postmates": "^1.0.2",
+    "twilio": "^2.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meggrasse/wildhackz.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/meggrasse/wildhackz/issues"
+  },
+  "homepage": "https://github.com/meggrasse/wildhackz#readme"
+}
