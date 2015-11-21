@@ -1,9 +1,17 @@
 <head>
-  <title>wildhackz</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="UTF-8">
+	<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link href="payment.css" rel="stylesheet">
+	<title>Payment</title>
 </head>
+<h1> Payment </h1>
+<div class = "payform col-md-8 col-md-offset-2">
 <form id="checkout" method="post" action="/checkout">
   <div id="payment-form"></div>
-  <input type="submit" value="Pay $10">
+    <button type="submit" value="pay" id="mc-embedded-subscribe" class="final btn btn-primary btn-lg clear button">Pay</button>
+    </div>
 </form>
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script>
@@ -16,3 +24,5 @@ braintree.setup(clientToken, "dropin", {
   container: "payment-form"
 });
 </script>
+</div>
+</body>
