@@ -209,15 +209,22 @@ app.get('/message', function (req, res) {
 function createDelivery(userData){
   var dev_id;
 
+  var newDataArr = maketheDataArr();
+    var topPerson=topNeed();
+    var userInWholeArr = newDataArr[topPerson[1]];
+
   var init_deliver= {
     manifest: "Holiday meal",
     pickup_name: "Wildhacks", //from front end form
-    pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
+    pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
     pickup_phone_number: "555-555-5555", //from front end form
     dropoff_name: "meal wanted", //from Twillio
     dropoff_phone_number: convertPhone(userData[0]), //converted phone numbe
-    dropoff_address: "20 McAllister St, San Francisco, CA",
+    dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
   }
+
+      console.log("TRYING TO GO HERE: " + userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8])
+
   //counter++;
 
   //calculate quote
@@ -240,11 +247,11 @@ function createDelivery(userData){
       quote_id: dev_id,
       manifest: "Holiday meal",
       pickup_name: "Wildhacks", //from front end form
-      pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
+      pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
       pickup_phone_number: "555-555-5555", //from front end form
       dropoff_name: "meal wanted", //from Twillio
       dropoff_phone_number: convertPhone(userData[0]), //converted phone number
-      dropoff_address: "20 McAllister St, San Francisco, CA",
+      dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
     }
 
    //make delievery

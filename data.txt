@@ -1,2 +1,2 @@
-+13127582107,0,2,1,dqt_K_5uRguM9WP0A-,950,2303 Sheridan Rd, Evanston, IL
-+12244201560,1,2,1,dqt_K_5u_e0xBnpK2V,950,2215 Sheridan road, noyes st, Evanston, IL
++13127582107,0,2,1,,,2303 Sheridan Rd, Evanston, IL
++12244201560,1,2,2,dqt_K_5zFeeBF35BAV,950,2215 noyes st, Evanston, IL
