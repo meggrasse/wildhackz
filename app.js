@@ -28,6 +28,20 @@ app.get('/message', function (req, res) {
    
 });
 
+
+var fs = require("fs");
+var path = "c:\\Temp\\Test.txt";
+var data = "Hello from the Node writeFile method!";
+
+fs.writeFile(path, data, function(error) {
+     if (error) {
+       console.error("write error:  " + error.message);
+     } else {
+       console.log("Successful Write to " + path);
+     }
+});
+
+
 app.get('/user', function (req, res) {
   res.send('Got a POST request');
 });
