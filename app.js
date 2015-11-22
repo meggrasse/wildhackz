@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var braintree = require('braintree');
-var delivery_quote = "waiting for request"
+var delivery_quote = "no pending requests - check back later"
 var dataArray = [];
 
 var gateway = braintree.connect({
@@ -29,7 +29,7 @@ app.get('/', function (req, res) {
   gateway.clientToken.generate({}, function (err, resBT) {
     res.render('index', {
       clientToken: resBT.clientToken,
-      total: delivery_quote,
+      amount: delivery_quote,
     });
   });
 });

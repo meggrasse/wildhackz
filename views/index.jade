@@ -8,10 +8,17 @@ html
       .row
         .col-md-8.col-md-offset-2
           h1 Payment
+          p1 Total cost: #{amount}
           form(action="/process",method="post")
             .form-group
-              label(for="amount") Total amount:
-              input.form-control(name="amount", type="text", value="#{total}", readonly)
+              label(for="name") Name:
+              input.form-control(name="name", type="text", placeholder="jennie")
+              label(for="pickup-address") Pickup Address:
+              input.form-control(name="pickup-address", type="text", placeholder="710 Emerson St, Evanston, IL")
+              label(for="phone-number") Phone Number:
+              input.form-control(name="phone-number", type="text", placeholder="333-333-3333")
+              label(for="description") Meal Description:
+              textarea.form-control(name="description", type="text", placeholder="description of the meal", row="4")
             #checkout
             hr
             button.btn.btn-primary(type="submit") Pay now
