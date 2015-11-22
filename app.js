@@ -1,6 +1,9 @@
 var express = require('express');
 var app = express();
 
+var dataArray = [];
+
+
 app.set('views', './views')
 app.set('view engine', 'jade')
 
@@ -13,6 +16,7 @@ app.get('/', function (req, res) {
 });
 
 
+
 app.get('/message', function (req, res) {
 	//res.sendfile(wildhackz + 'wildhackz.html');
   //res.send('Hello World!');
@@ -23,23 +27,58 @@ app.get('/message', function (req, res) {
    	//msg = "Hello there. You said:" + req.query.Body
    	//	res.render('message', { body: msg } );
 
-   	msg = req.query.Body
-   	res.render('message', { body: "Thanks for sending us your location, food is on the way!" } );
    
+   	tfrom = req.query.From  
+   
+
+   	//first time recieve a text
+   	msg = "Welcome! If you would like a meal, please send us location"
+   	var stage = 0;
+   	
+
+   	for(var i = 0; i < dataArray.length; i++){
+   		element = dataArray[i];
+
+   		console.log(element);
+
+   		if(element[0] == tfrom && element[2] > 0){
+   			msg = "Sorry, we only provide one meal per person"
+   			stage = 2;
+   		}
+
+
+   		if(element[0] == tfrom && element[2]==0){
+   			msg = "Thank you so much! We hope you enjoy your meal"
+   			element[2] = 1;
+   			stage = 1;
+   			element[1]=req.query.Body;
+
+   			console.log(element);
+   			tbody = req.query.Body
+   			
+   		}
+
+   		
+
+   	}
+
+   	if(stage == 0){
+   		var arryLine = [tfrom,"",0];
+   		dataArray.push(arryLine);
+
+   	}   		
+
+   
+
+  	//if first time user, add row in array for them
+  
+
+   	res.render('message', { body: msg } );
+   	
+   	
 });
 
 
-var fs = require("fs");
-var path = "c:\\Temp\\Test.txt";
-var data = "Hello from the Node writeFile method!";
-
-fs.writeFile(path, data, function(error) {
-     if (error) {
-       console.error("write error:  " + error.message);
-     } else {
-       console.log("Successful Write to " + path);
-     }
-});
 
 
 app.get('/user', function (req, res) {

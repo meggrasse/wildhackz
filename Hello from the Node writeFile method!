@@ -1,0 +1,7 @@
+function (error) {
+     if (error) {
+       console.error("write error:  " + error.message);
+     } else {
+       console.log("Successful Write to " + path);
+     }
+}
