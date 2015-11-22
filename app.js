@@ -54,21 +54,13 @@ app.get('/', function (req, res) {
   var delivery_quote; 
   var topPerson = topNeed();
   if(topPerson){
-    var dev_id = topPerson[4];
-    createDelivery(topPerson);
-    delivery_quote = topPerson[5];
-  
+    foodNeeded = "yes!"
   }else{
-     delivery_quote = "no pending requests - check back later"
+     foodNeeded = "no pending requests - check back later"
   }
+  
+    res.render('index', {  foodNeeded: foodNeeded});
 
-
-  gateway.clientToken.generate({}, function (err, resBT) {
-    res.render('index', {
-      clientToken: resBT.clientToken,
-      amount: delivery_quote,
-    });
-  });
 });
 
 app.post('/process', function (req, res) {
@@ -86,6 +78,33 @@ app.post('/process', function (req, res) {
 
   });
 });
+
+app.get('/loadForm', function (req, res) {
+
+  var inName = req.param.name;
+  var inAdd = req.param.pickup_address;
+  var inPhone = req.param.phone_number;
+  var inDes = req.param.description;
+  console.log("loading form mode")
+
+ createDelivery(inName, inAdd, inPhone, inDes, res);
+
+});
+
+
+app.get('/pay', function (req, res){
+    
+      gateway.clientToken.generate({}, function (err, resBT) {
+        var price = fs.readFileSync("price.txt");
+        res.render('pay', {
+          clientToken: resBT.clientToken,
+          amount: price
+      });
+
+    });
+});
+
+
 
 app.get('/payment-success', function (req, res) {
   res.render('success');
@@ -163,8 +182,9 @@ app.get('/message', function (req, res) {
     console.log("user status: " + status)
     var loc = userBody
     console.log("user loc: " + loc)
+    var id = userData[1];
 
-    processStatus(status, loc);
+    processStatus(id, status, loc);
 
   }else{
     newDataArr.push([req.query.From, userNumber, 1, 0, ""]);
@@ -182,12 +202,13 @@ app.get('/message', function (req, res) {
 
 
 
-  function processStatus(status, loc) {
+  function processStatus(id, status, loc) {
 
     if(status == 1){
       console.log("location passed to proccees: " + loc)
       msg = "Thank you so much! We hope you enjoy your meal";
-      var userInWholeArr = newDataArr[userData[1]];
+      var newDataArr = maketheDataArr();
+      var userInWholeArr = newDataArr[id];
       userInWholeArr[2] = 2;
       userInWholeArr[3] = 1;
       userInWholeArr[6] = loc;
@@ -206,7 +227,7 @@ app.get('/message', function (req, res) {
 
 
 
-function createDelivery(userData){
+function createDelivery(n, a, p, d, topRes){
   var dev_id;
 
   var newDataArr = maketheDataArr();
@@ -215,11 +236,11 @@ function createDelivery(userData){
 
   var init_deliver= {
     manifest: "Holiday meal",
-    pickup_name: "Wildhacks", //from front end form
+    pickup_name: n, //from front end form
     pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
     pickup_phone_number: "555-555-5555", //from front end form
     dropoff_name: "meal wanted", //from Twillio
-    dropoff_phone_number: convertPhone(userData[0]), //converted phone numbe
+    dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone numbe
     dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
   }
 
@@ -250,19 +271,24 @@ function createDelivery(userData){
       pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
       pickup_phone_number: "555-555-5555", //from front end form
       dropoff_name: "meal wanted", //from Twillio
-      dropoff_phone_number: convertPhone(userData[0]), //converted phone number
+      dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone number
       dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
     }
 
    //make delievery
     postmates.new(delivery, function(err, res) {
      console.log(res.body);
+     var price = res.body.fee;
 
+      fs.writeFileSync("price.txt", price);
+      topRes.redirect('/pay')
+
+
+      
     });
-
   });
-
 }
+      
 
 //function checkstatus(delivery)
 
