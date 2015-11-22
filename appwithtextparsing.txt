@@ -1,0 +1,63 @@
+app.get('/message', function (req, res) {
+	//res.sendfile(wildhackz + 'wildhackz.html');
+  //res.send('Hello World!');
+   	console.log("Query:")
+   	console.log(req.query)
+   	console.log(req.query.From)
+   	console.log(req.query.Body)
+   	//msg = "Hello there. You said:" + req.query.Body
+   	//	res.render('message', { body: msg } );
+
+   	tbody = ""
+   	tfrom = req.query.From  
+   
+
+   	//first time recieve a text
+   	msg = "Welcome! If you would like a meal, please send us (your name)/(location)"
+
+   	
+   	//if phone number exists
+   	dataArray.forEach(function(element, index, ar){
+   		if(element[0] == tfrom){
+   			tbody = req.query.Body
+   			element[1] = tbody;
+   			msg = "Thank you so much! We hope you enjoy your meal"
+   		}
+
+   	});
+
+   	dataArray.forEach(function(element, index, ar){
+   		if(element[1] != ""){
+   			msg = "Sorry, we only provide one meal per person"
+   		}
+
+   	});
+
+
+   	res.render('message', { body: msg } );
+
+   	textLine = tfrom+","+tbody+"\n"
+
+	var fs = require('fs');
+
+   	fs.writeFile("data.txt", textLine, function (err) {
+  	if(err) throw err;
+  		console.log('The "data to write" was written to file!');
+	});
+
+   	var arryLine;
+   
+
+	fs.readFile("data.txt", function(error, d) {
+  		if (error) { throw error; }
+  		d.toString().split("\n").forEach(function(line, index, arr) {
+    		if (index === arr.length - 1 && line === "") { return; }
+    			arryLine = line.split(",");
+    			dataArray.push(arryLine);
+  });
+
+  	console.log(dataArray[3])
+});
+
+   	
+});
