@@ -5,15 +5,50 @@ html
     link(href="/css/foundation.min.css", rel="stylesheet")
     link(href="/css/app.css", rel="stylesheet")
     link(href="/css/foundation-icons.css", rel="stylesheet")
+    script(src="/js/semantic.min.js")
+
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
+  img.background(src="/assets/darkwood.jpg")
   body
-    h1.centered Open Kitchen Now
-    .ui.divider
+    nav.ui.fixed.menu.inverted.navbar
+      .ui.secondary.pointing.menu
+        a.ui.item.active(href="#Home") Home
+        a.ui.item.active(href="#About") About
+        a.ui.item(href="#Donate") Donate
+    a(name="Home")
+    .container
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+      .centered
+        img.logo.floated.left(src="assets/logo2.png")
+      br
+      br
+      br
+      br
+      br
+      br
+    br
+    br
+
+    a(name="About")
+    .container
+      br
+      br
+      br
+      br
+
+    br
+    br
+
+    a(name="Donate")
     .container
       .row
         .medium-6.medium-offset-3.columns
-          h1.centered Payment
-
           form(action="/loadForm",method="post")
             .form-group
               label(for="name") Name:
@@ -25,3 +60,16 @@ html
               label(for="description") Meal Description:
               textarea.form-control(name="description", type="text", placeholder="description of the meal", row="4")
               button.expanded.success.button(type="submit") Next Step
+    br
+    br
+    br
+    br
+
+
+    script.
+      $('a').click(function(){
+        $('html, body').animate({
+          scrollTop: $( $.attr(this, 'href') ).offset().top
+        }, 500);
+        return false;
+      });

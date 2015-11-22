@@ -8,18 +8,18 @@ html
 
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
   body
-   h1.centered Open Kitchen
+    img.background(src="/assets/darkwood.jpg")
     .ui.divider
     .container
       .row
         .medium-6.medium-offset-3.columns
-          h1.centered Payment
-          p1 Total cost: #{amount}
-          form(action="/process",method="post")
-            .form-group
-            #checkout
-            hr
-            button.expanded.success.button(type="submit") Pay now
+          .form-group
+            h1.centered Payment
+            h3.centered Total cost: #{amount}
+            form(action="/process",method="post")
+              #checkout
+              hr
+              button.expanded.success.button(type="submit") Pay now
     script(src="/js/braintree.js")
     script.
       braintree.setup('#{clientToken}', 'dropin', {
