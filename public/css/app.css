@@ -1,3 +1,27 @@
 .centered {
   text-align: center;
 }
+
+.logo{
+  height:60%;
+  width: auto;
+
+  margin:0;
+  text-align: center;
+}
+
+.form-group {
+  border-radius: 5px;
+  padding: 15px 25px 45px;
+	-moz-box-shadow:    inset -3px -3px 0 rgba(0,0,0,.15);
+	-webkit-box-shadow: inset -3px -3px 0 rgba(0,0,0,.15);
+	box-shadow:         inset -3px -3px 0 rgba(0,0,0,.15);
+  background-color: #F0F0F0
+}
+
+.background {
+  z-index: -1;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+}
