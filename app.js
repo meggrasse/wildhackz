@@ -2,7 +2,8 @@ var express = require('express');
 var app = express();
 
 var dataArray = [];
-
+var Postmates = require('postmates');
+var postmates = new Postmates('cus_KI5W-plkMcICY-', '9a971592-0f9f-4aec-b531-9db3cc76442a');
 
 app.set('views', './views')
 app.set('view engine', 'jade')
@@ -27,14 +28,14 @@ app.get('/message', function (req, res) {
    	//msg = "Hello there. You said:" + req.query.Body
    	//	res.render('message', { body: msg } );
 
-   
-   	tfrom = req.query.From  
-   
+
+   	tfrom = req.query.From
+
 
    	//first time recieve a text
    	msg = "Welcome! If you would like a meal, please send us location"
    	var stage = 0;
-   	
+
 
    	for(var i = 0; i < dataArray.length; i++){
    		element = dataArray[i];
@@ -55,10 +56,10 @@ app.get('/message', function (req, res) {
 
    			console.log(element);
    			tbody = req.query.Body
-   			
+
    		}
 
-   		
+
 
    	}
 
@@ -66,16 +67,16 @@ app.get('/message', function (req, res) {
    		var arryLine = [tfrom,"",0];
    		dataArray.push(arryLine);
 
-   	}   		
+   	}
 
-   
+
 
   	//if first time user, add row in array for them
-  
+
 
    	res.render('message', { body: msg } );
-   	
-   	
+
+
 });
 
 
