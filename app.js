@@ -55,13 +55,10 @@ app.get('/', function (req, res) {
   var delivery_quote; 
   var topPerson = topNeed();
   if(topPerson){
-    foodNeeded = "yes!"
+    res.render('index');
   }else{
-     foodNeeded = "no pending requests - check back later"
+    res.render('noneneeded');
   }
-  
-    res.render('index', {  foodNeeded: foodNeeded});
-
 });
 
 app.post('/process', function (req, res) {
