@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var braintree = require('braintree');
 
 var dataArray = [];
+var postPhone;
 
 var gateway = braintree.connect({
   environment:  braintree.Environment.Sandbox,
@@ -84,6 +85,31 @@ app.get('/message', function (req, res) {
    			element[2] = 1;
    			stage = 1;
    			element[1]=req.query.Body;
+        
+
+        //create full a postmates deliever
+        var delivery = {
+          manifest: "Holiday meal",
+          pickup_name: "Wildhacks", //from front end form
+          pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
+          pickup_phone_number: "555-555-5555", //from front end form
+          dropoff_name: req.query.FromCity + "resident", //from Twillio
+          dropoff_phone_number: postPhone, //converted phone number
+          dropoff_address: element[1]
+  
+        };
+
+        //calculate quote
+        postmates.quote(initDelivery, function(err, res) {
+          var delivery_quote = res.body.fee;
+          console.log("Delivery quote is: " + res.body.fee); // 799
+        });
+
+       postmates.new(delivery, function(err, res) {
+        // `res.body`
+        console.log(res.body);
+
+      });
 
    			console.log(element);
    					
@@ -101,6 +127,30 @@ app.get('/message', function (req, res) {
 
     //reply back with the appropriate message
    	res.render('message', { body: msg } );
+
+
+
+
+    //convert Twillio phone number to Postmates format
+  
+    function convertPhone(tphone){
+      var tphoneArr = tphone.split('');
+
+      var postPhoneArr = ["X","X","X","-","X","X","X","-","X","X","X","X"];
+      postPhoneArr[0] = tphoneArr[1];
+      postPhoneArr[1] = tphoneArr[2];
+      postPhoneArr[2] = tphoneArr[3];
+
+      postPhoneArr[4] = tphoneArr[4];
+      postPhoneArr[5] = tphoneArr[5];
+      postPhoneArr[6] = tphoneArr[6];
+
+      postPhoneArr[8] = tphoneArr[7];
+      postPhoneArr[9] = tphoneArr[8];
+      postPhoneArr[10] = tphoneArr[9];
+  
+      postPhone = postPhoneArr.join();
+    }
    	
 });
 

@@ -1,0 +1,1 @@
+{"version":3,"sources":["meteor://💻app/template.wildhackz.js"],"names":[],"mappings":"yBAAA,0L","file":"/template.wildhackz.js","sourcesContent":["angular.module('angular-meteor').run(['$templateCache', function($templateCache) { $templateCache.put('undefined',\"<button>Click Me</button> <p>You've pressed the button {{counter}} times.</p>\");}]);"]}
