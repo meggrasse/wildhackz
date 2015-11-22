@@ -2,9 +2,8 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var braintree = require('braintree');
-
+var delivery_quote = "waiting for request"
 var dataArray = [];
-var postPhone;
 
 var gateway = braintree.connect({
   environment:  braintree.Environment.Sandbox,
@@ -30,7 +29,7 @@ app.get('/', function (req, res) {
   gateway.clientToken.generate({}, function (err, resBT) {
     res.render('index', {
       clientToken: resBT.clientToken,
-      total: 5,
+      total: delivery_quote,
     });
   });
 });
@@ -86,7 +85,7 @@ app.get('/message', function (req, res) {
    			stage = 1;
    			element[1]=req.query.Body;
         
-
+        console.log(element[1]);
         //create full a postmates deliever
         var delivery = {
           manifest: "Holiday meal",
@@ -94,14 +93,14 @@ app.get('/message', function (req, res) {
           pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
           pickup_phone_number: "555-555-5555", //from front end form
           dropoff_name: req.query.FromCity + "resident", //from Twillio
-          dropoff_phone_number: postPhone, //converted phone number
+          dropoff_phone_number: convertPhone(tfrom), //converted phone number
           dropoff_address: element[1]
   
         };
 
         //calculate quote
-        postmates.quote(initDelivery, function(err, res) {
-          var delivery_quote = res.body.fee;
+        postmates.quote(delivery, function(err, res) {
+          delivery_quote = res.body.fee;
           console.log("Delivery quote is: " + res.body.fee); // 799
         });
 
@@ -134,22 +133,26 @@ app.get('/message', function (req, res) {
     //convert Twillio phone number to Postmates format
   
     function convertPhone(tphone){
+      var postPhone;
       var tphoneArr = tphone.split('');
 
       var postPhoneArr = ["X","X","X","-","X","X","X","-","X","X","X","X"];
-      postPhoneArr[0] = tphoneArr[1];
-      postPhoneArr[1] = tphoneArr[2];
-      postPhoneArr[2] = tphoneArr[3];
+      postPhoneArr[0] = tphoneArr[2];
+      postPhoneArr[1] = tphoneArr[3];
+      postPhoneArr[2] = tphoneArr[4];
 
-      postPhoneArr[4] = tphoneArr[4];
-      postPhoneArr[5] = tphoneArr[5];
-      postPhoneArr[6] = tphoneArr[6];
+      postPhoneArr[4] = tphoneArr[5];
+      postPhoneArr[5] = tphoneArr[6];
+      postPhoneArr[6] = tphoneArr[7];
 
-      postPhoneArr[8] = tphoneArr[7];
-      postPhoneArr[9] = tphoneArr[8];
-      postPhoneArr[10] = tphoneArr[9];
+      postPhoneArr[8] = tphoneArr[8];
+      postPhoneArr[9] = tphoneArr[9];
+      postPhoneArr[10] = tphoneArr[10];
+      postPhoneArr[11] = tphoneArr[11];
   
-      postPhone = postPhoneArr.join();
+      postPhone = postPhoneArr.join('');
+      console.log(postPhone);
+      return postPhone;
     }
    	
 });
