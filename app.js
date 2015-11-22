@@ -70,6 +70,11 @@ app.get('/payment-success', function (req, res) {
   res.render('success');
 });
 
+app.get('/data', function (req, res){
+  res.render('data', {dataArray: dataArray})
+
+})
+
 //messaging code
 app.get('/message', function (req, res) {
 	 //print recieved text to console log
@@ -130,10 +135,11 @@ app.get('/message', function (req, res) {
    		dataArray.push(arryLine);
    	}   		
 
-    //reply back with the appropriate message
-   	res.render('message', { body: msg } );
+    //reply back with the appropriate message 
+   	res.render('message', { body: msg, dataArray: dataArray } );
   
 });
+
 
 
 function createDelivery(tphone, tdropoff_add, tcity){

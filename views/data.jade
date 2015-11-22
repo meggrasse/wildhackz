@@ -1,0 +1,12 @@
+html
+
+	script(type="text/javascript").
+		setInterval(function(){
+			window.location.reload()
+		}, 5000)
+
+	body
+	- for (var i = 0; i < dataArray.length; ++i) {
+		div!= dataArray[i]
+	- }
+		
