@@ -1,0 +1,1 @@
+{"version":3,"sources":["meteor://💻app/template.message.js"],"names":[],"mappings":"yBAAA,qK","file":"/template.message.js","sourcesContent":["angular.module('angular-meteor').run(['$templateCache', function($templateCache) { $templateCache.put('message.html',\"<response> <message> Hellooooo </message> </response>\");}]);"]}

@@ -1,0 +1,1 @@
+{"head":"<title>wildhackz</title>","body":"<h1>Welcome to Meteor!</h1>\n\n  {{> hello}}","js":"angular.module('angular-meteor').run(['$templateCache', function($templateCache) { $templateCache.put('undefined',\"<button>Click Me</button> <p>You've pressed the button {{counter}} times.</p>\");}]);","bodyAttrs":{}}
