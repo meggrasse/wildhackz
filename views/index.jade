@@ -32,23 +32,28 @@ html
       br
       br
       br
+      br
 
     .container
       .row
         .medium-6.medium-offset-3.columns
           p1 Total cost: #{amount}
           a(name="Donate")
-          form(action="/loadForm",method="get")
+          form(action="/loadForm",method="post")
             .form-group
               label(for="name") Name:
-              input.form-control(name="name", type="text", placeholder="jennie")
+              input.form-control(name="name", type="text", placeholder="Jennie")
               label(for="pickup_address") Pickup Address:
-              input.form-control(name="pickup_address", type="text", placeholder="710 Emerson St, Evanston, IL")
+              input.form-control(name="pickup_address", type="text", placeholder="123 Emerson St, Evanston, IL")
               label(for="phone_number") Phone Number:
-              input.form-control(name="phone_number", type="text", placeholder="333-333-3333")
+              input.form-control(name="phone_number", type="text", placeholder="555-555-5555")
               label(for="description") Meal Description:
-              textarea.form-control(name="description", type="text", placeholder="description of the meal", row="4")
+              textarea.form-control(name="description", type="text", placeholder="Description of the meal", row="4")
               button.expanded.success.button(type="submit") Next Step
+    br
+    br
+    br
+    br
 
 
     script(src="/js/braintree.js")
