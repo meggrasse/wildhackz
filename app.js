@@ -154,7 +154,7 @@ app.get('/message', function (req, res) {
   console.log(req.query.Body)
   var userBody = req.query.Body;
 
-  var msg;
+  var msg = "def";
   
   var fs = require('fs');
 
@@ -181,8 +181,8 @@ app.get('/message', function (req, res) {
     var loc = userBody
     console.log("user loc: " + loc)
     var id = userData[1];
-
-    processStatus(id, status, loc);
+    msg = processStatus(id, status, loc);
+    newDataArr = maketheDataArr();
 
   }else{
     newDataArr.push([req.query.From, userNumber, 1, 0, ""]);
@@ -196,9 +196,6 @@ app.get('/message', function (req, res) {
  fs.writeFileSync("data.txt", newDataArr.join('\n'));
  
   res.render('message', { body: msg} );
-
-
-
 
   function processStatus(id, status, loc) {
 
@@ -218,10 +215,16 @@ app.get('/message', function (req, res) {
 
     }
     
+    return msg;
   }
+});
+
+
+
+
+  
 
     
-});
 
 
 
