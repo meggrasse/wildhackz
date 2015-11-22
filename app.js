@@ -1,10 +1,9 @@
 //set up APIs and framework
 var express = require('express');
+var numeral = require('numeral');
 var app = express();
 var bodyParser = require('body-parser');
 var braintree = require('braintree');
-var delivery_quote = "no pending requests - check back later"
-var dataArray = [];
 
 var gateway = braintree.connect({
   environment:  braintree.Environment.Sandbox,
@@ -15,8 +14,8 @@ var gateway = braintree.connect({
 
 //add Postmates API
 var Postmates = require('postmates');
-var postmate_customer_id = 'cus_KI5W-plkMcICY-';
-var postmates = new Postmates(postmate_customer_id, '9a971592-0f9f-4aec-b531-9db3cc76442a');
+var postmate_customer_id = 'cus_K3wY5touMWVW_k';
+var postmates = new Postmates(postmate_customer_id, '340c95fe-16e4-4071-91e8-9d10f75f6cc4');
 
 app.set('views', './views')
 app.set('view engine', 'jade')
@@ -25,29 +24,41 @@ app.use(express.static('public'));
 app.use(bodyParser.json({limit: '500mb'}));
 app.use(bodyParser.urlencoded({ extended: false }));
 
+var fs = require('fs');
+
+app.get('/start', function (req, res) {
+  res.render('start', {});
+});
 
 
-//initalize varibles
-var delivery_quote = 0;
-var testMode = 0;
-var dataArray;
-var tdropoff_add;
-var status;
 
-//test mode
-if(testMode == 1){
-  dataArray = [ [+16504659649,"101 Market St, San Francisco, CA",1, 0], [+41088672445,"20 McAllister St, San Francisco, CA",1, 0]];
+function topNeed(){
+
+  var newDataArr = maketheDataArr();
+  var topPerson = newDataArr.find(item => {
+    console.log("PRINT" + item[3]);
+    return item[3] == 1
+  });
+   console.log("TOP PERSON" + topPerson);
+   return topPerson
+
+  fs.writeFileSync("data.txt", newDataArr.join('\n'));
+
 }
+   
 
 
 // respond with "Hello World!" on the homepage
 app.get('/', function (req, res) {
-  gateway.clientToken.generate({}, function (err, resBT) {
-    res.render('index', {
-      clientToken: resBT.clientToken,
-      amount: delivery_quote,
-    });
-  });
+
+
+  var delivery_quote; 
+  var topPerson = topNeed();
+  if(topPerson){
+    res.render('index');
+  }else{
+    res.render('noneneeded');
+  }
 });
 
 app.post('/process', function (req, res) {
@@ -64,121 +75,229 @@ app.post('/process', function (req, res) {
     }
 
   });
-})
+});
+
+app.get('/loadForm', function (req, res) {
+
+  var inName = req.param.name;
+  var inAdd = req.param.pickup_address;
+  var inPhone = req.param.phone_number;
+  var inDes = req.param.description;
+  console.log("loading form mode")
+
+ createDelivery(inName, inAdd, inPhone, inDes, res);
+
+});
+
+
+app.get('/pay', function (req, res){
+    
+      gateway.clientToken.generate({}, function (err, resBT) {
+        var price = fs.readFileSync("price.txt");
+        res.render('pay', {
+          clientToken: resBT.clientToken,
+          amount: price
+      });
+
+    });
+});
+
+
 
 app.get('/payment-success', function (req, res) {
   res.render('success');
+
+  var newDataArr = maketheDataArr();
+  var topPerson = topNeed();
+  console.log("Payment success thinks top person is: " + topPerson)
+  var indexTopPerson = topPerson[1];
+  var userInWholeArr = newDataArr[indexTopPerson];
+  userInWholeArr[3] = 2;
+
+  fs.writeFileSync("data.txt", newDataArr.join('\n'));
+
+    
+  
+
 });
 
-app.get('/data', function (req, res){
-  res.render('data', {dataArray: dataArray})
 
-})
+app.get('/data', function (req, res){
+    var newDataArr = maketheDataArr();
+    res.render('data', {newDataArr: newDataArr})
+
+});
+
+
+function maketheDataArr() {
+  var fs = require('fs');
+  var buf = fs.readFileSync("data.txt", "utf8");
+
+  var bufferString = buf.toString().trim();
+  newDataArr = [];
+  if (bufferString) {
+    newDataArr = bufferString.split('\n').map(line => {
+      return line.split(',')
+    });
+  }
+  return newDataArr;
+
+}
+
 
 //messaging code
 app.get('/message', function (req, res) {
-	 //print recieved text to console log
+   //print recieved text to console log
    //console.log("Query:")
    //console.log(req.query)
-   console.log(req.query.From)
-   console.log(req.query.Body)
-   
-   //user's phone number
-   tfrom = req.query.From  
-   
+  console.log(req.query.From)
+  console.log(req.query.Body)
+  var userBody = req.query.Body;
 
-   //initalize twillio stage to 0
-  var tstage = 0;
-  var status;
-  //if it is a first time user, set message 
-  msg = "Welcome! If you would like a meal, please send us location"
-   	
-    //look through dataArray
-   	for(var i = 0; i < dataArray.length; i++){
-   		element = dataArray[i];
-
-   		console.log(element);
-
-      //if user is already past stage 1
-   		if(element[0] == tfrom && element[2] > 0){
-   			//msg = "Status of deliever is: " + res.body.status;
-   			msg = "Sorry only one meal per person";
-        tstage = 2;
-   		}
-
-      //if user phone number exists and texting for second time
-      //then they are sending their location, store
-   		if(element[0] == tfrom && element[2]==0){
-   			msg = "Thank you so much! We hope you enjoy your meal"
-   			element[2] = 1;
-   			tstage = 1;
-   			element[1]=req.query.Body;
-        //status = postmates.get(postmate_customer_id, function(err, res) {
-        //  res.body.status; // "pickup"
-        //});
-        //element[3] = status;
-
-        //create full a postmates deliever
-        tdropoff_add = element[1];
-        createDelivery(tfrom, tdropoff_add, req.query.FromCity);
-   					
-   		}
-
-   	}
-
-
-
-    //set up array if a first time user
-   	if(tstage == 0){
-                      //#, address, Twillo stage, postmages stages
-   		var arryLine = [tfrom,"",0, 0];
-   		dataArray.push(arryLine);
-   	}   		
-
-    //reply back with the appropriate message 
-   	res.render('message', { body: msg, dataArray: dataArray } );
+  var msg;
   
+  var fs = require('fs');
+
+  //var dataArray = [];
+  // buf.toString().split("\n").forEach(function(line, index, arr){
+  //   //dataArray.push(line.split(","));
+  // }
+
+  //sync splits up array into happy
+  
+  var newDataArr = maketheDataArr();
+  var userNumber = newDataArr.length;
+
+  console.log(newDataArr);
+
+  //find the users set of data this is sync
+  var userData = newDataArr.find(item => {
+    return item[0] === req.query.From
+  })
+
+  if(userData){
+    var status = userData[2];
+    console.log("user status: " + status)
+    var loc = userBody
+    console.log("user loc: " + loc)
+    var id = userData[1];
+
+    processStatus(id, status, loc);
+
+  }else{
+    newDataArr.push([req.query.From, userNumber, 1, 0, ""]);
+    msg = "Welcome! If you would like a meal, please send us your location in the format (101 Market St., Main St, San Francisco, CA)"
+    //console.log(newDataArr);
+    //console.log(userNumber);
+  }
+ 
+ console.log(newDataArr);
+
+ fs.writeFileSync("data.txt", newDataArr.join('\n'));
+ 
+  res.render('message', { body: msg} );
+
+
+
+
+  function processStatus(id, status, loc) {
+
+    if(status == 1){
+      console.log("location passed to proccees: " + loc)
+      msg = "Thank you so much! We hope you enjoy your meal";
+      var newDataArr = maketheDataArr();
+      var userInWholeArr = newDataArr[id];
+      userInWholeArr[2] = 2;
+      userInWholeArr[3] = 1;
+      userInWholeArr[6] = loc;
+      fs.writeFileSync("data.txt", newDataArr.join('\n'));
+
+
+    }else if(status == 2){
+      msg = "Sorry only one meal per person";
+
+    }
+    
+  }
+
+    
 });
 
 
 
-function createDelivery(tphone, tdropoff_add, tcity){
+function createDelivery(n, a, p, d, topRes){
+  var dev_id;
 
+  var newDataArr = maketheDataArr();
+    var topPerson=topNeed();
+    var userInWholeArr = newDataArr[topPerson[1]];
 
-  var delivery = {
-    quote_id: "123",
+  var init_deliver= {
     manifest: "Holiday meal",
-    pickup_name: "Wildhacks", //from front end form
-    pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
+    pickup_name: n, //from front end form
+    pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
     pickup_phone_number: "555-555-5555", //from front end form
-    dropoff_name: tcity + "resident", //from Twillio
-    dropoff_phone_number: convertPhone(tphone), //converted phone number
-    dropoff_address: "20 McAllister St, San Francisco, CA",
+    dropoff_name: "meal wanted", //from Twillio
+    dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone numbe
+    dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
   }
+
+      console.log("TRYING TO GO HERE: " + userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8])
+
   //counter++;
 
   //calculate quote
-  postmates.quote(delivery, function(err, res) {
-    delivery_quote = res.body.fee;
-    console.log("Delivery quote is: " + res.body.fee); // 799
-  });
+  postmates.quote(init_deliver, function(err, res) {
+    console.log("Delivery quote is: " + res.body.fee);
+    console.log("Delivery id is: " + res.body.id);
+    dev_id = res.body.id;
+
+    var newDataArr = maketheDataArr();
+    var topPerson=topNeed();
+    var userInWholeArr = newDataArr[topPerson[1]];
+    console.log("THE TOP NEEED" + topPerson)
+    userInWholeArr[4] = dev_id;
+    userInWholeArr[5] = res.body.fee;
+    console.log("HIHIHI" + dev_id)
+    fs.writeFileSync("data.txt", newDataArr.join('\n'));
+
+
+    var delivery = {
+      quote_id: dev_id,
+      manifest: "Holiday meal",
+      pickup_name: "Wildhacks", //from front end form
+      pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
+      pickup_phone_number: "555-555-5555", //from front end form
+      dropoff_name: "meal wanted", //from Twillio
+      dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone number
+      dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
+    }
 
    //make delievery
-  postmates.new(delivery, function(err, res) {
-    console.log(res.body);
+    postmates.new(delivery, function(err, res) {
+     console.log(res.body);
+     var price = res.body.fee;
+     price = convertPrice(price);
+     
+      var fs = require('fs');
+      fs.writeFileSync("price.txt", price);
+      topRes.redirect('/pay')
 
-    console.log("Status is from new :" + res.body.status);
-    status = res.body.status;
 
+      
+    });
   });
-
-  postmates.get('123', function(err, res) {
-    console.log("Status is :" + res.body.status); // "pickup"
-  });
-
-
-
 }
+      
+function convertPrice(price1){
+  console.log(price1)
+
+  var happyPrice = numeral(price1/100).format('$0,0.00');
+  return happyPrice;
+  console.log(happyPrice)
+  
+}
+
 
 //function checkstatus(delivery)
 
@@ -208,29 +327,14 @@ function convertPhone(tphone){
 }
 
 
-app.get('/user', function (req, res) {
-  res.send('Got a POST request');
-});
-
-
-// accept POST request on the homepage
-app.post('/', function (req, res) {
-  res.send('Got a POST request');
-});
-
-// accept PUT request at /user
-app.put('/user', function (req, res) {
-  res.send('Got a PUT request at /user');
-});
-
-// accept DELETE request at /user
-app.delete('/user', function (req, res) {
-  res.send('Got a DELETE request at /user');
-});
-
 var server = app.listen(3000, function () {
   var host = server.address().address;
   var port = server.address().port;
 
   console.log('Example app listening at http://%s:%s', host, port);
 });
+
+
+
+
+

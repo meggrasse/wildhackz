@@ -1,0 +1,27 @@
+html
+  head
+    title Pay
+    link(href="/css/semantic.min.css", rel="stylesheet")
+    link(href="/css/foundation.min.css", rel="stylesheet")
+    link(href="/css/app.css", rel="stylesheet")
+    link(href="/css/foundation-icons.css", rel="stylesheet")
+
+    meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
+  body
+   h1.centered Open Kitchen
+    .ui.divider
+    .container
+      .row
+        .medium-6.medium-offset-3.columns
+          h1.centered Payment
+          p1 Total cost: #{amount}
+          form(action="/process",method="post")
+            .form-group
+            #checkout
+            hr
+            button.expanded.success.button(type="submit") Pay now
+    script(src="/js/braintree.js")
+    script.
+      braintree.setup('#{clientToken}', 'dropin', {
+        container: 'checkout',
+      });

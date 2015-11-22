@@ -8,38 +8,47 @@ html
     script(src="/js/semantic.min.js")
 
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
-  img.background(src="/assets/bg.jpg")
+  img.background(src="/assets/darkwood.jpg")
   body
     nav.ui.fixed.menu.inverted.navbar
-      h3 Open Kitchen
-      .right.ui.secondary.pointing.menu
-        a.ui.item.active Home
-        a.ui.item Donate
+      .ui.secondary.pointing.menu
+        a.ui.item.active(href="#Home") Home
+        a.ui.item(href="#Donate") Donate
+    a(name="Home")
     .container
       br
       br
       br
-      img.logo.floated.left(src="assets/logo2.png")
+      br
+      br
+      br
+      br
+      .centered
+        img.logo.floated.left(src="assets/logo2.png")
+      br
+      br
+      br
+      br
+      br
+      br
+      br
+
     .container
       .row
         .medium-6.medium-offset-3.columns
           p1 Total cost: #{amount}
-          form(action="/process",method="post")
+          a(name="Donate")
+          form(action="/loadForm",method="get")
             .form-group
               label(for="name") Name:
-              input.form-control(name="name", type="text", placeholder="Jennie")
-              label(for="pickup-address") Pickup Address:
-              input.form-control(name="pickup-address", type="text", placeholder="2305 Sheridan Rd, Evanston, IL")
-              label(for="phone-number") Phone Number:
-              input.form-control(name="phone-number", type="text", placeholder="555-555-5555")
+              input.form-control(name="name", type="text", placeholder="jennie")
+              label(for="pickup_address") Pickup Address:
+              input.form-control(name="pickup_address", type="text", placeholder="710 Emerson St, Evanston, IL")
+              label(for="phone_number") Phone Number:
+              input.form-control(name="phone_number", type="text", placeholder="333-333-3333")
               label(for="description") Meal Description:
-              textarea.form-control(name="description", type="text", placeholder="Description of the meal", row="4")
-            br
-            br
-            br
-            .form-group
-              #checkout
-              button.expanded.success.button(type="submit") Donate
+              textarea.form-control(name="description", type="text", placeholder="description of the meal", row="4")
+              button.expanded.success.button(type="submit") Next Step
 
 
     script(src="/js/braintree.js")
