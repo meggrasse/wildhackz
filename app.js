@@ -1,12 +1,32 @@
 var express = require('express');
 var app = express();
 
+app.set('views', './views')
+app.set('view engine', 'jade')
+
 // respond with "Hello World!" on the homepage
 app.get('/', function (req, res) {
 	//res.sendfile(wildhackz + 'wildhackz.html');
-  res.send('Hello World!');
+  //res.send('Hello World!');
+   	res.render('index', { title: 'Hey', message: 'Hello there asdfasdfasd up', message2: "Hi"});
+
 });
 
+
+app.get('/message', function (req, res) {
+	//res.sendfile(wildhackz + 'wildhackz.html');
+  //res.send('Hello World!');
+   	console.log("Query:")
+   	console.log(req.query)
+   	console.log(req.query.From)
+   	console.log(req.query.Body)
+   	//msg = "Hello there. You said:" + req.query.Body
+   	//	res.render('message', { body: msg } );
+
+   	msg = req.query.Body
+   	res.render('message', { body: "Thanks for sending us your location, food is on the way!" } );
+   
+});
 
 app.get('/user', function (req, res) {
   res.send('Got a POST request');
