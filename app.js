@@ -80,12 +80,12 @@ app.post('/process', function (req, res) {
   });
 });
 
-app.get('/loadForm', function (req, res) {
-
-  var inName = req.param.name;
-  var inAdd = req.param.pickup_address;
-  var inPhone = req.param.phone_number;
-  var inDes = req.param.description;
+app.post('/loadForm/', function (req, res) {
+  var inName = req.body.name;
+  var inAdd = req.body.pickup_address;
+  var inPhone = req.body.phone_number;
+  var inDes = req.body.description;
+  console.log("HERHEHEHEHE" +inName)
   console.log("loading form mode")
 
  createDelivery(inName, inAdd, inPhone, inDes, res);
@@ -232,14 +232,17 @@ function createDelivery(n, a, p, d, topRes){
   var dev_id;
 
   var newDataArr = maketheDataArr();
-    var topPerson=topNeed();
-    var userInWholeArr = newDataArr[topPerson[1]];
+  var topPerson=topNeed();
+  var userInWholeArr = newDataArr[topPerson[1]];
+
+  console.log("NNN" + n.name);
+  
 
   var init_deliver= {
     manifest: "Holiday meal",
     pickup_name: n, //from front end form
-    pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
-    pickup_phone_number: "555-555-5555", //from front end form
+    pickup_address: a, //from front end form
+    pickup_phone_number: p, //from front end form
     dropoff_name: "meal wanted", //from Twillio
     dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone numbe
     dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
@@ -267,10 +270,10 @@ function createDelivery(n, a, p, d, topRes){
 
     var delivery = {
       quote_id: dev_id,
-      manifest: "Holiday meal",
-      pickup_name: "Wildhacks", //from front end form
-      pickup_address: "2303 Sheridan Rd, Evanston, IL", //from front end form
-      pickup_phone_number: "555-555-5555", //from front end form
+      manifest: d,
+      pickup_name: n, //from front end form
+      pickup_address: a, //from front end form
+      pickup_phone_number: p, //from front end form
       dropoff_name: "meal wanted", //from Twillio
       dropoff_phone_number: convertPhone(userInWholeArr[0]), //converted phone number
       dropoff_address: userInWholeArr[6]+","+ userInWholeArr[7]+","+userInWholeArr[8]
@@ -278,7 +281,7 @@ function createDelivery(n, a, p, d, topRes){
 
    //make delievery
     postmates.new(delivery, function(err, res) {
-     console.log(res.body);
+     console.log("MAKING DELIV " + res.body);
      var price = res.body.fee;
      price = convertPrice(price);
      

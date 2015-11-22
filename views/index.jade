@@ -8,7 +8,7 @@ html
 
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
   body
-    h1.centered Open Kitchen
+    h1.centered Open Kitchen Now
     .ui.divider
     .container
       .row
@@ -16,7 +16,7 @@ html
           h1.centered Payment
           p1 Status: #{foodNeeded}
 
-          form(action="/loadForm",method="get")
+          form(action="/loadForm",method="post")
             .form-group
               label(for="name") Name:
               input.form-control(name="name", type="text", placeholder="jennie")
