@@ -12,6 +12,11 @@ var gateway = braintree.connect({
   privateKey:   '085b2474efa0b406e596eb01a6403d45'
 });
 
+//add Postmates API
+var Postmates = require('postmates');
+var postmates = new Postmates('cus_KI5W-plkMcICY-', '9a971592-0f9f-4aec-b531-9db3cc76442a');
+
+
 app.set('views', './views')
 app.set('view engine', 'jade')
 
@@ -45,37 +50,35 @@ app.post('/process', function (req, res) {
   });
 })
 
-
+//messaging code
 app.get('/message', function (req, res) {
-	//res.sendfile(wildhackz + 'wildhackz.html');
-  //res.send('Hello World!');
-   	console.log("Query:")
-   	console.log(req.query)
-   	console.log(req.query.From)
-   	console.log(req.query.Body)
-   	//msg = "Hello there. You said:" + req.query.Body
-   	//	res.render('message', { body: msg } );
-
+	 //print recieved text to console log
+   console.log("Query:")
+   console.log(req.query)
+   console.log(req.query.From)
+   console.log(req.query.Body)
    
-   	tfrom = req.query.From  
+   //user's phone number
+   tfrom = req.query.From  
    
 
-   	//first time recieve a text
-   	msg = "Welcome! If you would like a meal, please send us location"
-   	var stage = 0;
+   //initalize stage to 0
+  var stage = 0;
    	
-
+    //look through dataArray
    	for(var i = 0; i < dataArray.length; i++){
    		element = dataArray[i];
 
    		console.log(element);
 
+      //if user is already past stage 1
    		if(element[0] == tfrom && element[2] > 0){
    			msg = "Sorry, we only provide one meal per person"
    			stage = 2;
    		}
 
-
+      //if user phone number exists and texting for second time
+      //then they are sending their location, store
    		if(element[0] == tfrom && element[2]==0){
    			msg = "Thank you so much! We hope you enjoy your meal"
    			element[2] = 1;
@@ -83,20 +86,20 @@ app.get('/message', function (req, res) {
    			element[1]=req.query.Body;
 
    			console.log(element);
-   			
-   			
+   					
    		}
 
-   		
-
    	}
+
+    //if it is a first time user, set message store their data in the array
+    msg = "Welcome! If you would like a meal, please send us location"
 
    	if(stage == 0){
    		var arryLine = [tfrom,"",0];
    		dataArray.push(arryLine);
-
    	}   		
 
+    //reply back with the appropriate message
    	res.render('message', { body: msg } );
    	
 });
