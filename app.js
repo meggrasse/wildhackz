@@ -29,9 +29,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //initalize varibles
 var delivery_quote = 0;
-var testMode = 1;
+var testMode = 0;
 var dataArray;
 var tdropoff_add;
+var status;
 
 //test mode
 if(testMode == 1){
@@ -58,7 +59,7 @@ app.post('/process', function (req, res) {
       console.log(err);
       res.redirect('/payment-error')
     } else {
-      console.log(result);
+      //console.log(result);
       res.redirect('/payment-success')
     }
 
@@ -72,8 +73,8 @@ app.get('/payment-success', function (req, res) {
 //messaging code
 app.get('/message', function (req, res) {
 	 //print recieved text to console log
-   console.log("Query:")
-   console.log(req.query)
+   //console.log("Query:")
+   //console.log(req.query)
    console.log(req.query.From)
    console.log(req.query.Body)
    
@@ -132,16 +133,14 @@ app.get('/message', function (req, res) {
     //reply back with the appropriate message
    	res.render('message', { body: msg } );
   
-
-    console.log(dataArray[0], dataArray[1]);
-   	
 });
 
 
 function createDelivery(tphone, tdropoff_add, tcity){
-  var delivery_id;
+
 
   var delivery = {
+    quote_id: "123",
     manifest: "Holiday meal",
     pickup_name: "Wildhacks", //from front end form
     pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
@@ -150,22 +149,28 @@ function createDelivery(tphone, tdropoff_add, tcity){
     dropoff_phone_number: convertPhone(tphone), //converted phone number
     dropoff_address: "20 McAllister St, San Francisco, CA",
   }
+  //counter++;
 
   //calculate quote
   postmates.quote(delivery, function(err, res) {
     delivery_quote = res.body.fee;
-    delivery_id = res.body.id;
     console.log("Delivery quote is: " + res.body.fee); // 799
   });
 
    //make delievery
   postmates.new(delivery, function(err, res) {
     console.log(res.body);
+
+    console.log("Status is from new :" + res.body.status);
+    status = res.body.status;
+
   });
 
-  postmates.get(delivery_id, function(err, res) {
-    console.log("Status is: " + res.body.status); // "pickup"
+  postmates.get('123', function(err, res) {
+    console.log("Status is :" + res.body.status); // "pickup"
   });
+
+
 
 }
 
@@ -192,7 +197,7 @@ function convertPhone(tphone){
       postPhoneArr[11] = tphoneArr[11];
   
       postPhone = postPhoneArr.join('');
-      console.log(postPhone);
+      //console.log(postPhone);
       return postPhone;
 }
 
