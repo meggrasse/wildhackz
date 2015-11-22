@@ -235,7 +235,7 @@ function createDelivery(n, a, p, d, topRes){
   var topPerson=topNeed();
   var userInWholeArr = newDataArr[topPerson[1]];
 
-  console.log("NNN" + n.name);
+  console.log("NNN" + n);
   
 
   var init_deliver= {
@@ -281,8 +281,9 @@ function createDelivery(n, a, p, d, topRes){
 
    //make delievery
     postmates.new(delivery, function(err, res) {
-     console.log("MAKING DELIV " + res.body);
+     console.log(res.body);
      var price = res.body.fee;
+     console.log(price)
      price = convertPrice(price);
      
       var fs = require('fs');
@@ -296,11 +297,12 @@ function createDelivery(n, a, p, d, topRes){
 }
       
 function convertPrice(price1){
-  console.log(price1)
 
-  var happyPrice = numeral(price1/100).format('$0,0.00');
+  price1 = price1/100;
+
+  var happyPrice = numeral(price1).format('$0,0.00');
   return happyPrice;
-  console.log(happyPrice)
+
   
 }
 
