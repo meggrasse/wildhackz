@@ -50,6 +50,10 @@ app.post('/process', function (req, res) {
   });
 })
 
+app.get('/payment-success', function (req, res) {
+  res.render('success');
+});
+
 //messaging code
 app.get('/message', function (req, res) {
 	 //print recieved text to console log
