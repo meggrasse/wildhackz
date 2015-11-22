@@ -3,14 +3,15 @@ html
     title Donate
     link(href="/css/semantic.min.css", rel="stylesheet")
     link(href="/css/foundation.min.css", rel="stylesheet")
-    link(href="/css/app.css", rel="stylesheet")
     link(href="/css/foundation-icons.css", rel="stylesheet")
-
+    link(href="/css/bootstrap.min.css", rel="stylesheet")
+    link(href="/css/noneneeded.css", rel="stylesheet")
     meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
   body
     h1.centered Title
     .ui.divider
     .container
-      .row
-        .medium-6.medium-offset-3.columns
-          h1.centered No food currently requested, check back later!
+      .col-md-6.col-md-offset-3
+        .jumbotron
+          h1 No food currently requested
+          p Check back later!
