@@ -1,5 +1,6 @@
 //set up APIs and framework
 var express = require('express');
+var numeral = require('numeral');
 var app = express();
 var bodyParser = require('body-parser');
 var braintree = require('braintree');
@@ -96,7 +97,6 @@ app.get('/pay', function (req, res){
     
       gateway.clientToken.generate({}, function (err, resBT) {
         var price = fs.readFileSync("price.txt");
-        price = convertPrice(price);
         res.render('pay', {
           clientToken: resBT.clientToken,
           amount: price
@@ -295,31 +295,12 @@ function createDelivery(n, a, p, d, topRes){
 function convertPrice(price1){
   console.log(price1)
 
-  var priceArr = price1.split('');
-  var happyPriceA;
-
-  var i = priceArr.length;
-  if (i ==4){
-    happyPriceA[5] = priceArr[3]
-    happyPriceA[4] = priceArr[2]
-    happyPriceA[3] = "."
-    happyPriceA[2] = priceArr[1]
-    happyPriceA[1] = priceArr[0]
-    happyPriceA[0] = "$"
-
-  }else{
-    happyPriceA[4] = priceArr[3]
-    happyPriceA[3] = priceArr[2]
-    happyPriceA[2] = "."
-    happyPriceA[1] = priceArr[1]
-    happyPriceA[0] = "$"
-
-  }
-
-    var happyPrice = happyPriceA.join('');
-    return happyPrice;
+  var happyPrice = numeral(price1/100).format('$0,0.00');
+  return happyPrice;
+  console.log(happyPrice)
   
 }
+
 
 //function checkstatus(delivery)
 
