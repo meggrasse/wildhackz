@@ -1,9 +1,22 @@
 html
   head
-  	script(src = https://torrid-inferno-3974.firebaseio.com/)
-    title!= Wildhackzzz
+    title Donate
+    link(href="/css/bootstrap.min.css", rel="stylesheet")
+    meta(name="viewport", content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0")
   body
-    h1 hello this is a test
-    p Hello
-    h1!= message
-    
+    .container
+      .row
+        .col-md-8.col-md-offset-2
+          h1 Payment
+          form(action="/process",method="post")
+            .form-group
+              label(for="amount") Total amount:
+              input.form-control(name="amount", type="text", value="#{total}", readonly)
+            #checkout
+            hr
+            button.btn.btn-primary(type="submit") Pay now
+    script(src="/js/braintree.js")
+    script.
+      braintree.setup('#{clientToken}', 'dropin', {
+        container: 'checkout',
+      });

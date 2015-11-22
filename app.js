@@ -1,20 +1,49 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+var braintree = require('braintree');
 
 var dataArray = [];
 
+var gateway = braintree.connect({
+  environment:  braintree.Environment.Sandbox,
+  merchantId:   'fmqk85bqzy2m8qmn',
+  publicKey:    'vjy9m2njdx29dqb9',
+  privateKey:   '085b2474efa0b406e596eb01a6403d45'
+});
 
 app.set('views', './views')
 app.set('view engine', 'jade')
 
+app.use(express.static('public'));
+app.use(bodyParser.json({limit: '500mb'}));
+app.use(bodyParser.urlencoded({ extended: false }));
+
 // respond with "Hello World!" on the homepage
 app.get('/', function (req, res) {
-	//res.sendfile(wildhackz + 'wildhackz.html');
-  //res.send('Hello World!');
-   	res.render('index', { title: 'Hey', message: 'Hello there asdfasdfasd up', message2: "Hi"});
-
+  gateway.clientToken.generate({}, function (err, resBT) {
+    res.render('index', {
+      clientToken: resBT.clientToken,
+      total: 5,
+    });
+  });
 });
 
+app.post('/process', function (req, res) {
+  gateway.transaction.sale({
+    amount: req.body.amount,
+    paymentMethodNonce: req.body.payment_method_nonce,
+  }, function (err, result) {
+    if (err) {
+      console.log(err);
+      res.redirect('/payment-error')
+    } else {
+      console.log(result);
+      res.redirect('/payment-success')
+    }
+
+  });
+})
 
 
 app.get('/message', function (req, res) {
