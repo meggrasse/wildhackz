@@ -95,8 +95,9 @@ app.get('/message', function (req, res) {
 
       //if user is already past stage 1
    		if(element[0] == tfrom && element[2] > 0){
-   			msg = "Status of deliever is: " + res.body.status;
-   			tstage = 2;
+   			//msg = "Status of deliever is: " + res.body.status;
+   			msg = "Sorry only one meal per person";
+        tstage = 2;
    		}
 
       //if user phone number exists and texting for second time
@@ -138,6 +139,7 @@ app.get('/message', function (req, res) {
 
 
 function createDelivery(tphone, tdropoff_add, tcity){
+  var delivery_id;
 
   var delivery = {
     manifest: "Holiday meal",
@@ -152,6 +154,7 @@ function createDelivery(tphone, tdropoff_add, tcity){
   //calculate quote
   postmates.quote(delivery, function(err, res) {
     delivery_quote = res.body.fee;
+    delivery_id = res.body.id;
     console.log("Delivery quote is: " + res.body.fee); // 799
   });
 
@@ -160,7 +163,7 @@ function createDelivery(tphone, tdropoff_add, tcity){
     console.log(res.body);
   });
 
-  postmates.get(postmate_customer_id, function(err, res) {
+  postmates.get(delivery_id, function(err, res) {
     console.log("Status is: " + res.body.status); // "pickup"
   });
 
