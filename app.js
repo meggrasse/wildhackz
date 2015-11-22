@@ -1,9 +1,8 @@
+//set up APIs and framework
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 var braintree = require('braintree');
-var delivery_quote = "waiting for request"
-var dataArray = [];
 
 var gateway = braintree.connect({
   environment:  braintree.Environment.Sandbox,
@@ -14,8 +13,8 @@ var gateway = braintree.connect({
 
 //add Postmates API
 var Postmates = require('postmates');
-var postmates = new Postmates('cus_KI5W-plkMcICY-', '9a971592-0f9f-4aec-b531-9db3cc76442a');
-
+var postmate_customer_id = 'cus_KI5W-plkMcICY-';
+var postmates = new Postmates(postmate_customer_id, '9a971592-0f9f-4aec-b531-9db3cc76442a');
 
 app.set('views', './views')
 app.set('view engine', 'jade')
@@ -23,6 +22,20 @@ app.set('view engine', 'jade')
 app.use(express.static('public'));
 app.use(bodyParser.json({limit: '500mb'}));
 app.use(bodyParser.urlencoded({ extended: false }));
+
+
+
+//initalize varibles
+var delivery_quote = 0;
+var testMode = 1;
+var dataArray;
+var tdropoff_add;
+
+//test mode
+if(testMode == 1){
+  dataArray = [ [+16504659649,"101 Market St, San Francisco, CA",1, 0], [+41088672445,"20 McAllister St, San Francisco, CA",1, 0]];
+}
+
 
 // respond with "Hello World!" on the homepage
 app.get('/', function (req, res) {
@@ -66,8 +79,11 @@ app.get('/message', function (req, res) {
    tfrom = req.query.From  
    
 
-   //initalize stage to 0
-  var stage = 0;
+   //initalize twillio stage to 0
+  var tstage = 0;
+  var status;
+  //if it is a first time user, set message 
+  msg = "Welcome! If you would like a meal, please send us location"
    	
     //look through dataArray
    	for(var i = 0; i < dataArray.length; i++){
@@ -77,8 +93,8 @@ app.get('/message', function (req, res) {
 
       //if user is already past stage 1
    		if(element[0] == tfrom && element[2] > 0){
-   			msg = "Sorry, we only provide one meal per person"
-   			stage = 2;
+   			msg = "Status of deliever is: " + res.body.status;
+   			tstage = 2;
    		}
 
       //if user phone number exists and texting for second time
@@ -86,57 +102,73 @@ app.get('/message', function (req, res) {
    		if(element[0] == tfrom && element[2]==0){
    			msg = "Thank you so much! We hope you enjoy your meal"
    			element[2] = 1;
-   			stage = 1;
+   			tstage = 1;
    			element[1]=req.query.Body;
-        
-        console.log(element[1]);
+        //status = postmates.get(postmate_customer_id, function(err, res) {
+        //  res.body.status; // "pickup"
+        //});
+        //element[3] = status;
+
         //create full a postmates deliever
-        var delivery = {
-          manifest: "Holiday meal",
-          pickup_name: "Wildhacks", //from front end form
-          pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
-          pickup_phone_number: "555-555-5555", //from front end form
-          dropoff_name: req.query.FromCity + "resident", //from Twillio
-          dropoff_phone_number: convertPhone(tfrom), //converted phone number
-          dropoff_address: element[1]
-  
-        };
-
-        //calculate quote
-        postmates.quote(delivery, function(err, res) {
-          delivery_quote = res.body.fee;
-          console.log("Delivery quote is: " + res.body.fee); // 799
-        });
-
-       postmates.new(delivery, function(err, res) {
-        // `res.body`
-        console.log(res.body);
-
-      });
-
-   			console.log(element);
+        tdropoff_add = element[1];
+        createDelivery(tfrom, tdropoff_add, req.query.FromCity);
    					
    		}
 
    	}
 
-    //if it is a first time user, set message store their data in the array
-    msg = "Welcome! If you would like a meal, please send us location"
 
-   	if(stage == 0){
-   		var arryLine = [tfrom,"",0];
+
+    //set up array if a first time user
+   	if(tstage == 0){
+                      //#, address, Twillo stage, postmages stages
+   		var arryLine = [tfrom,"",0, 0];
    		dataArray.push(arryLine);
    	}   		
 
     //reply back with the appropriate message
    	res.render('message', { body: msg } );
-
-
-
-
-    //convert Twillio phone number to Postmates format
   
-    function convertPhone(tphone){
+
+    console.log(dataArray[0], dataArray[1]);
+   	
+});
+
+
+function createDelivery(tphone, tdropoff_add, tcity){
+
+  var delivery = {
+    manifest: "Holiday meal",
+    pickup_name: "Wildhacks", //from front end form
+    pickup_address: "20 McAllister St, San Francisco, CA", //from front end form
+    pickup_phone_number: "555-555-5555", //from front end form
+    dropoff_name: tcity + "resident", //from Twillio
+    dropoff_phone_number: convertPhone(tphone), //converted phone number
+    dropoff_address: "20 McAllister St, San Francisco, CA",
+  }
+
+  //calculate quote
+  postmates.quote(delivery, function(err, res) {
+    delivery_quote = res.body.fee;
+    console.log("Delivery quote is: " + res.body.fee); // 799
+  });
+
+   //make delievery
+  postmates.new(delivery, function(err, res) {
+    console.log(res.body);
+  });
+
+  postmates.get(postmate_customer_id, function(err, res) {
+    console.log("Status is: " + res.body.status); // "pickup"
+  });
+
+}
+
+//function checkstatus(delivery)
+
+
+//convert Twillio phone number to Postmates format
+function convertPhone(tphone){
       var postPhone;
       var tphoneArr = tphone.split('');
 
@@ -157,11 +189,7 @@ app.get('/message', function (req, res) {
       postPhone = postPhoneArr.join('');
       console.log(postPhone);
       return postPhone;
-    }
-   	
-});
-
-
+}
 
 
 app.get('/user', function (req, res) {
